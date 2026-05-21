@@ -1,0 +1,23 @@
+[Unit]
+Description=Xboard Octane HTTP server
+After=network.target mysql.service redis-server.service
+Wants=redis-server.service
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/xboard/current
+Environment=APP_ENV=production
+Environment=OCTANE_WORKERS=2
+Environment=OCTANE_TASK_WORKERS=1
+Environment=OCTANE_MAX_REQUESTS=500
+ExecStart=/usr/bin/php artisan octane:start --server=swoole --host=127.0.0.1 --port=7001 --workers=${OCTANE_WORKERS} --task-workers=${OCTANE_TASK_WORKERS} --max-requests=${OCTANE_MAX_REQUESTS}
+ExecReload=/usr/bin/php artisan octane:reload
+Restart=always
+RestartSec=5
+KillSignal=SIGTERM
+TimeoutStopSec=30
+
+[Install]
+WantedBy=multi-user.target

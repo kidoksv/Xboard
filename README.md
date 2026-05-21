@@ -48,6 +48,8 @@ docker compose up -d
 ### Deployment Guides
 - [Deploy with 1Panel](./docs/en/installation/1panel.md)
 - [Deploy with Docker Compose](./docs/en/installation/docker-compose.md)
+- [Traditional Deployment without Docker](./docs/en/installation/traditional.md)
+- [传统部署（不使用 Docker）](./docs/zh/installation/traditional.md)
 - [Deploy with aaPanel](./docs/en/installation/aapanel.md)
 - [Deploy with aaPanel + Docker](./docs/en/installation/aapanel-docker.md) (Recommended)
 

@@ -1,0 +1,35 @@
+name: Traditional SSH Deploy Example
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Branch, tag, or commit to deploy"
+        required: true
+        default: "master"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Deploy on server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.PROD_HOST }}
+          username: ${{ secrets.PROD_USER }}
+          key: ${{ secrets.PROD_SSH_KEY }}
+          port: ${{ secrets.PROD_SSH_PORT || 22 }}
+          script_stop: true
+          script: |
+            set -e
+            cd /var/www/xboard/current
+            REF="${{ github.event.inputs.ref }}"
+            git fetch --tags --prune origin
+            if git rev-parse --verify --quiet "refs/remotes/origin/$REF" >/dev/null; then
+              git checkout -B "$REF" "origin/$REF"
+            else
+              git checkout --force "$REF"
+            fi
+            APP_DIR=/var/www/xboard/current SYSTEMCTL_BIN="sudo systemctl" bash deploy/traditional/scripts/deploy-release.sh

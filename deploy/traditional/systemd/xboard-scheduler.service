@@ -1,0 +1,9 @@
+[Unit]
+Description=Xboard Laravel scheduler runner
+
+[Service]
+Type=oneshot
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/xboard/current
+ExecStart=/usr/bin/php artisan schedule:run
