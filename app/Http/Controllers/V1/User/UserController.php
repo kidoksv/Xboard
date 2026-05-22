@@ -156,17 +156,21 @@ class UserController extends Controller
                 return $this->fail([400, __('Subscription plan does not exist')]);
             }
         }
-        $user['subscribe_url'] = Helper::getSubscribeUrl($user['token']);
+        $originalSubscribeUrl = Helper::getSubscribeUrl($user['token']);
         $hy2Servers = collect(ServerService::getAvailableServers($user))
             ->filter(fn($server) => ($server['type'] ?? null) === 'hysteria'
                 && (int) data_get($server, 'protocol_settings.version', 2) === 2)
             ->values()
             ->all();
+        $hy2SubscribeContent = Hysteria2::encodeServers($hy2Servers);
+
+        $user['subscribe_url'] = $hy2SubscribeContent;
+        $user['original_subscribe_url'] = $originalSubscribeUrl;
         $user['hy2_subscribe_url'] = Helper::getSubscribeUrlWithQuery($user['token'], [
             'types' => 'hysteria',
             'flag' => 'hy2',
         ]);
-        $user['hy2_subscribe_content'] = Hysteria2::encodeServers($hy2Servers);
+        $user['hy2_subscribe_content'] = $hy2SubscribeContent;
         $userService = new UserService();
         $user['reset_day'] = $userService->getResetDay($user);
         $user = HookManager::filter('user.subscribe.response', $user);
