@@ -10,9 +10,11 @@ use App\Models\Order;
 use App\Models\Plan;
 use App\Models\Ticket;
 use App\Models\User;
+use App\Protocols\Hysteria2;
 use App\Services\Auth\LoginService;
 use App\Services\AuthService;
 use App\Services\Plugin\HookManager;
+use App\Services\ServerService;
 use App\Services\UserService;
 use App\Utils\CacheKey;
 use App\Utils\Helper;
@@ -155,6 +157,16 @@ class UserController extends Controller
             }
         }
         $user['subscribe_url'] = Helper::getSubscribeUrl($user['token']);
+        $hy2Servers = collect(ServerService::getAvailableServers($user))
+            ->filter(fn($server) => ($server['type'] ?? null) === 'hysteria'
+                && (int) data_get($server, 'protocol_settings.version', 2) === 2)
+            ->values()
+            ->all();
+        $user['hy2_subscribe_url'] = Helper::getSubscribeUrlWithQuery($user['token'], [
+            'types' => 'hysteria',
+            'flag' => 'hy2',
+        ]);
+        $user['hy2_subscribe_content'] = Hysteria2::encodeServers($hy2Servers);
         $userService = new UserService();
         $user['reset_day'] = $userService->getResetDay($user);
         $user = HookManager::filter('user.subscribe.response', $user);

@@ -142,6 +142,18 @@ class Helper
         return HookManager::filter('subscribe.url', $finalUrl);
     }
 
+    public static function getSubscribeUrlWithQuery(string $token, array $query, $subscribeUrl = null)
+    {
+        $url = self::getSubscribeUrl($token, $subscribeUrl);
+        $query = array_filter($query, fn($value) => $value !== null && $value !== '');
+
+        if (empty($query)) {
+            return $url;
+        }
+
+        return $url . (str_contains($url, '?') ? '&' : '?') . http_build_query($query);
+    }
+
     public static function randomPort($range): int {
         $portRange = explode('-', (string) $range, 2);
         $min = (int) ($portRange[0] ?? 0);
