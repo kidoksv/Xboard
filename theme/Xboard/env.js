@@ -4,7 +4,7 @@ window.settings = {
   title: 'Xboard',
   // 主题色
   theme: {
-    color: 'anyway', //可选default、blue、black、、darkblue
+    color: 'blue', //可选default、blue、black、darkblue
   },
   // 站点描述
   description: 'Xboard',
